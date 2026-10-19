@@ -41,8 +41,8 @@ pull request is **merged** into `main` (or the workflow is run manually via `wor
 2. Builds the jar and pushes `quay.io/mcruzdev/ownyourcareer:<version>` (uses the same
    `QUAY_USERNAME`/`QUAY_PASSWORD` secrets as above).
 
-It does not touch the `:latest`/`:<sha>` images that `docker-publish.yml` keeps publishing on
-every push to `main` — the two workflows are independent.
+It does not touch the `:main` image that `docker-publish.yml` keeps publishing on every push to
+`main` — the two workflows are independent.
 
 Locally, export `GITHUB_USERNAME`, `GITHUB_TOKEN` and `OPENAI_API_KEY`, then:
 

@@ -23,7 +23,7 @@ public class GitHubIssueReporter {
         String[] ownerAndRepo = repository.split("/", 2);
         String title = "Weekly contributions: %s".formatted(weekLabel);
         GitHubIssueResponse response = client.createIssue(
-                "Bearer " + token,
+                "Bearer " + token.strip(),
                 "application/vnd.github+json",
                 ownerAndRepo[0],
                 ownerAndRepo[1],

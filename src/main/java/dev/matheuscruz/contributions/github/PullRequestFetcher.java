@@ -38,7 +38,7 @@ public class PullRequestFetcher {
     private void collect(Map<String, GitHubPullRequest> byKey, WeekWindow window, String dateField) {
         String query = "author:%s is:pr %s:%s..%s".formatted(username, dateField, window.since(), window.until());
         GitHubSearchResponse response = client.searchIssues(
-                "Bearer " + token, "application/vnd.github+json", query, 100);
+                "Bearer " + token.strip(), "application/vnd.github+json", query, 100);
         for (GitHubSearchResponse.Item item : response.items()) {
             String project = toProject(item.repository_url());
             String key = project + "#" + item.number();
