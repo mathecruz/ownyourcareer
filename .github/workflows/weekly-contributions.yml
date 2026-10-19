@@ -1,0 +1,31 @@
+name: Weekly contributions report
+
+on:
+  schedule:
+    # Every Friday at 20:00 UTC — covers Monday..Friday of the current week.
+    - cron: "0 20 * * 5"
+  workflow_dispatch: {}
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build
+        run: ./mvnw -B -DskipTests package
+
+      - name: Generate weekly contributions report and open issue
+        env:
+          GITHUB_USERNAME: ${{ vars.CONTRIBUTIONS_USERNAME }}
+          GITHUB_TOKEN: ${{ secrets.CONTRIBUTIONS_GH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: java -jar target/quarkus-app/quarkus-run.jar
