@@ -1,7 +1,5 @@
 package dev.matheuscruz.contributions;
 
-import java.util.Map;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -22,11 +20,25 @@ public class Main implements QuarkusApplication {
 
     @Override
     public int run(String... args) {
-        String result = workflow.startInstance(Map.of())
+        ExecutionInput input = parseArgs(args);
+        String result = workflow.startInstance(input)
                 .await().indefinitely()
                 .as(String.class)
                 .orElse("no contributions generated");
         System.out.println(result);
         return 0;
+    }
+
+    private static ExecutionInput parseArgs(String... args) {
+        String since = null;
+        String until = null;
+        for (String arg : args) {
+            if (arg.startsWith("--since=")) {
+                since = arg.substring("--since=".length());
+            } else if (arg.startsWith("--until=")) {
+                until = arg.substring("--until=".length());
+            }
+        }
+        return new ExecutionInput(since, until);
     }
 }

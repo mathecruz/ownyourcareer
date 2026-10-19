@@ -1,4 +1,6 @@
 package dev.matheuscruz.contributions.github;
 
-public record GitHubIssueRequest(String title, String body) {
+import java.util.List;
+
+public record GitHubIssueRequest(String title, String body, List<String> labels) {
 }

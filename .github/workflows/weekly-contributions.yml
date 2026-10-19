@@ -4,7 +4,14 @@ on:
   schedule:
     # Every Friday at 20:00 UTC — covers Monday..Friday of the current week.
     - cron: "0 20 * * 5"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "Override start date (YYYY-MM-DD). Leave empty to use the current work week."
+        required: false
+      until:
+        description: "Override end date (YYYY-MM-DD). Leave empty to use the current work week."
+        required: false
 
 jobs:
   generate-report:
@@ -28,4 +35,7 @@ jobs:
           GITHUB_USERNAME: ${{ secrets.CONTRIBUTIONS_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.CONTRIBUTIONS_GH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: java -jar target/quarkus-app/quarkus-run.jar
+        run: |
+          java -jar target/quarkus-app/quarkus-run.jar \
+            ${{ inputs.since && format('--since={0}', inputs.since) || '' }} \
+            ${{ inputs.until && format('--until={0}', inputs.until) || '' }}

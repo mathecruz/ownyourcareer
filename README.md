@@ -10,6 +10,16 @@ It runs as a **command-mode app**: it executes once, prints the created issue's 
 no HTTP server stays up. `.github/workflows/weekly-contributions.yml` runs it every Friday via
 `workflow_dispatch`/cron.
 
+By default, it covers the current Monday–Friday. To report on a different range, pass
+`--since=YYYY-MM-DD --until=YYYY-MM-DD`:
+
+```shell script
+java -jar target/quarkus-app/quarkus-run.jar --since=2026-10-12 --until=2026-10-16
+```
+
+The same override is exposed as `since`/`until` inputs when running `weekly-contributions.yml`
+manually via `workflow_dispatch`.
+
 ### Configuration
 
 | Variable | Where | Purpose |

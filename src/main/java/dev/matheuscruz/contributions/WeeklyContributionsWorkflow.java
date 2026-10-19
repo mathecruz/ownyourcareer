@@ -35,8 +35,8 @@ public class WeeklyContributionsWorkflow extends Flow {
     public Workflow descriptor() {
         return workflow("weekly-contributions")
                 .tasks(
-                        function("fetchPullRequests", (Object ignoredInput) -> fetchWeek(), Object.class,
-                                WeekSummaryInput.class),
+                        function("fetchPullRequests", this::fetchWeek,
+                                ExecutionInput.class, WeekSummaryInput.class),
                         function("summarize",
                                 (WeekSummaryInput input) -> new IssueDraft(input.weekLabel(),
                                         summaryAgent.summarizeWeek(input.weekLabel(), input.pullRequestsBlock())),
@@ -47,8 +47,10 @@ public class WeeklyContributionsWorkflow extends Flow {
                 .build();
     }
 
-    private WeekSummaryInput fetchWeek() {
-        WeekWindow window = WeekWindow.currentWorkWeek(LocalDate.now());
+    private WeekSummaryInput fetchWeek(ExecutionInput input) {
+        WeekWindow window = input != null && input.hasCustomRange()
+                ? WeekWindow.of(LocalDate.parse(input.since()), LocalDate.parse(input.until()))
+                : WeekWindow.currentWorkWeek(LocalDate.now());
         List<GitHubPullRequest> pullRequests = fetcher.fetchPullRequests(window);
         String block = pullRequests.stream()
                 .map(pr -> "Title: %s | Body: %s | URL: %s | Project: %s".formatted(

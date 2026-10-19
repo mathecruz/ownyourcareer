@@ -13,6 +13,10 @@ public record WeekWindow(LocalDate since, LocalDate until, String label) {
         return new WeekWindow(monday, friday, formatLabel(monday, friday));
     }
 
+    public static WeekWindow of(LocalDate since, LocalDate until) {
+        return new WeekWindow(since, until, formatLabel(since, until));
+    }
+
     private static String formatLabel(LocalDate since, LocalDate until) {
         if (since.getMonth() == until.getMonth() && since.getYear() == until.getYear()) {
             DateTimeFormatter day = DateTimeFormatter.ofPattern("d");
