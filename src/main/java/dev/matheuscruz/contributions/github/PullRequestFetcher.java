@@ -26,15 +26,25 @@ public class PullRequestFetcher {
     @ConfigProperty(name = "github.token")
     String token;
 
-    public List<GitHubPullRequest> fetchPullRequests(WeekWindow window) {
+    public List<GitHubPullRequest> fetchPullRequests(WeekWindow window, List<String> repositories) {
         Map<String, GitHubPullRequest> byKey = new LinkedHashMap<>();
-        collect(byKey, window, "created");
-        collect(byKey, window, "merged");
+        if (repositories == null || repositories.isEmpty()) {
+            collect(byKey, window, "created", null);
+            collect(byKey, window, "merged", null);
+        } else {
+            for (String repository : repositories) {
+                collect(byKey, window, "created", repository);
+                collect(byKey, window, "merged", repository);
+            }
+        }
         return List.copyOf(byKey.values());
     }
 
-    private void collect(Map<String, GitHubPullRequest> byKey, WeekWindow window, String dateField) {
+    private void collect(Map<String, GitHubPullRequest> byKey, WeekWindow window, String dateField, String repository) {
         String query = "author:%s is:pr %s:%s..%s".formatted(username, dateField, window.since(), window.until());
+        if (repository != null) {
+            query += " repo:" + repository;
+        }
         GitHubSearchResponse response = client.searchIssues(
                 "Bearer " + token, "application/vnd.github+json", query, 100);
         for (GitHubSearchResponse.Item item : response.items()) {

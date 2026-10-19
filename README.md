@@ -17,7 +17,15 @@ By default, it covers the current Monday–Friday. To report on a different rang
 java -jar target/quarkus-app/quarkus-run.jar --since=2026-10-12 --until=2026-10-16
 ```
 
-The same override is exposed as `since`/`until` inputs when running `weekly-contributions.yml`
+By default, it searches pull requests across every repository the configured user has access to.
+To restrict the search to specific repositories, pass a comma-separated `owner/repo` list via
+`--repos`:
+
+```shell script
+java -jar target/quarkus-app/quarkus-run.jar --repos=quarkiverse/quarkus-flow,open-workflow-specification/sdk-java
+```
+
+The same overrides are exposed as `since`/`until`/`repos` inputs when running `weekly-contributions.yml`
 manually via `workflow_dispatch`.
 
 ### Configuration

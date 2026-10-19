@@ -51,7 +51,8 @@ public class WeeklyContributionsWorkflow extends Flow {
         WeekWindow window = input != null && input.hasCustomRange()
                 ? WeekWindow.of(LocalDate.parse(input.since()), LocalDate.parse(input.until()))
                 : WeekWindow.currentWorkWeek(LocalDate.now());
-        List<GitHubPullRequest> pullRequests = fetcher.fetchPullRequests(window);
+        List<String> repositories = input != null ? input.repositories() : List.of();
+        List<GitHubPullRequest> pullRequests = fetcher.fetchPullRequests(window, repositories);
         String block = pullRequests.stream()
                 .map(pr -> "Title: %s | Body: %s | URL: %s | Project: %s | Status: %s".formatted(
                         pr.title(), safeBody(pr.body()), pr.htmlUrl(), pr.project(), pr.status()))

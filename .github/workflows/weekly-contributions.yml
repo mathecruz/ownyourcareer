@@ -12,6 +12,9 @@ on:
       until:
         description: "Override end date (YYYY-MM-DD). Leave empty to use the current work week."
         required: false
+      repos:
+        description: "Comma-separated owner/repo list to restrict the search to. Leave empty to search all repos."
+        required: false
 
 jobs:
   generate-report:
@@ -38,4 +41,5 @@ jobs:
         run: |
           java -jar target/quarkus-app/quarkus-run.jar \
             ${{ inputs.since && format('--since={0}', inputs.since) || '' }} \
-            ${{ inputs.until && format('--until={0}', inputs.until) || '' }}
+            ${{ inputs.until && format('--until={0}', inputs.until) || '' }} \
+            ${{ inputs.repos && format('--repos={0}', inputs.repos) || '' }}
