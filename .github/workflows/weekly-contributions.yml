@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate weekly contributions report and open issue
         env:
-          GITHUB_USERNAME: ${{ secrets.CONTRIBUTIONS_USERNAME }}
+          GITHUB_USERNAME: ${{ env.CONTRIBUTIONS_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.CONTRIBUTIONS_GH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
