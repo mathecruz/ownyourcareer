@@ -53,8 +53,8 @@ public class WeeklyContributionsWorkflow extends Flow {
                 : WeekWindow.currentWorkWeek(LocalDate.now());
         List<GitHubPullRequest> pullRequests = fetcher.fetchPullRequests(window);
         String block = pullRequests.stream()
-                .map(pr -> "Title: %s | Body: %s | URL: %s | Project: %s".formatted(
-                        pr.title(), safeBody(pr.body()), pr.htmlUrl(), pr.project()))
+                .map(pr -> "Title: %s | Body: %s | URL: %s | Project: %s | Status: %s".formatted(
+                        pr.title(), safeBody(pr.body()), pr.htmlUrl(), pr.project(), pr.status()))
                 .collect(Collectors.joining("\n"));
         return new WeekSummaryInput(window.label(), block.isBlank() ? "(no pull requests this week)" : block);
     }

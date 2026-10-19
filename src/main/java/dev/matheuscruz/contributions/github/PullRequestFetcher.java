@@ -40,12 +40,26 @@ public class PullRequestFetcher {
         for (GitHubSearchResponse.Item item : response.items()) {
             String project = toProject(item.repository_url());
             String key = project + "#" + item.number();
-            byKey.putIfAbsent(key, new GitHubPullRequest(project, item.title(), item.body(), item.html_url()));
+            byKey.putIfAbsent(key, new GitHubPullRequest(
+                    project, item.title(), item.body(), item.html_url(), toStatus(item)));
         }
     }
 
     private static String toProject(String repositoryUrl) {
         String[] parts = repositoryUrl.split("/repos/");
         return parts.length == 2 ? parts[1] : repositoryUrl;
+    }
+
+    private static String toStatus(GitHubSearchResponse.Item item) {
+        if (item.pull_request() != null && item.pull_request().merged_at() != null) {
+            return "done";
+        }
+        if ("closed".equals(item.state())) {
+            return "closed";
+        }
+        if (item.draft()) {
+            return "in-progress";
+        }
+        return "in-review";
     }
 }

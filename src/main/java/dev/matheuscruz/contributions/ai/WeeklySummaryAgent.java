@@ -26,10 +26,15 @@ public interface WeeklySummaryAgent {
 
             Project: <owner/repo>
 
-            Use the exact labels "Week:", "Pull request:" and "Project:" verbatim. Do not add \
-            headings, bullet points, numbering, or wrap the output in a code block. Write in \
-            English. Be factual: do not invent details that are not supported by the title or \
-            body you were given.
+            Status: [<status>]
+
+            Use the exact labels "Week:", "Pull request:", "Project:" and "Status:" verbatim. \
+            For the Status line, copy the status you were given for that pull request exactly \
+            as-is, lowercase, wrapped in square brackets (for example "[done]", "[in-review]" \
+            or "[in-progress]") — do not translate, rename, or invent a different status. Do \
+            not add headings, bullet points, numbering, or wrap the output in a code block. \
+            Write in English. Be factual: do not invent details that are not supported by the \
+            title or body you were given.
 
             Example of a single block:
 
@@ -41,6 +46,8 @@ public interface WeeklySummaryAgent {
             Pull request: https://github.com/quarkusio/quarkus/pull/57459
 
             Project: quarkusio/quarkus
+
+            Status: [done]
             """)
     @UserMessage("""
             Week label: {weekLabel}
