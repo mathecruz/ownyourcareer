@@ -69,6 +69,19 @@ Locally, export `GITHUB_USERNAME`, `GITHUB_TOKEN` and `OPENAI_API_KEY`, then:
 java -jar target/quarkus-app/quarkus-run.jar
 ```
 
+Sample output:
+
+```shell
+2026-10-20 13:53:24,960 INFO [io.quarkus] (main) ownyourcareer 0.1.0 on JVM (powered by Quarkus 3.40.1.1) started in 0.858s.
+2026-10-20 13:53:24,964 INFO [io.quarkus] (main) Profile prod activated.
+2026-10-20 13:53:24,964 INFO [io.quarkus] (main) Installed features: [cdi, flow, jackson-jq, langchain4j, langchain4j-openai, qute, rest-client, rest-client-jackson, smallrye-context-propagation, smallrye-fault-tolerance, vertx]
+2026-10-20 13:53:24,995 INFO [org.hibernate.validator.internal.util.Version] (main) HV000001: Hibernate Validator 9.1.5.Final
+2026-10-20 13:53:25,003 INFO [io.quarkiverse.flow.internal.WorkflowApplicationInitializer] (executor-thread-1) Flow: WorkflowApplication (id: 'ownyourcareer') is ready. Starting workflow definitions warmup.
+2026-10-20 13:53:25,004 INFO [io.quarkiverse.flow.internal.WorkflowApplicationInitializer] (executor-thread-1) Warming up 1 WorkflowDefinition beans
+2026-10-20 13:53:25,179 INFO [io.quarkiverse.flow.internal.WorkflowApplicationInitializer] (executor-thread-1) Flow: Workflow definitions warmup complete.
+Week: 19-20 October 2026
+```
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.

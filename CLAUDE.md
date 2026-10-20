@@ -67,10 +67,11 @@ Step-by-step:
 2. **`summarize`** calls `WeeklySummaryAgent` (a `@RegisterAiService` langchain4j interface —
    there is no implementation class; the body is generated at build time from the `@SystemMessage`
    /`@UserMessage` prompt templates), returning the final markdown report string. The system
-   prompt is strict about output shape: one `Week:`/prose/`Pull request:`/`Project:`/`Status:`
-   block per PR, labels verbatim, status copied through unchanged and lowercase, and no issue/PR
-   cross-references other than the one `Pull request:` URL (so the report never creates GitHub
-   back-links when logged). If you change the expected output format, the prompt in
+   prompt is strict about output shape: a single `# Weekly contributions: <week label>` heading,
+   then one `## <owner/repo>`/prose/`- **Pull request:**`/`- **Status:**` block per PR separated
+   by `---` rules, labels verbatim, status copied through unchanged and lowercase, and no issue/PR
+   cross-references other than that PR's own `[#<number>](<url>)` link (so the report never
+   creates GitHub back-links when logged). If you change the expected output format, the prompt in
    `WeeklySummaryAgent` is the single source of truth to edit.
 
 `GitHubSearchClient` (`/search/issues`) is the only REST client, sharing the `github-api`
