@@ -6,9 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Quarkus **command-mode** app (no HTTP server): it runs once, fetches the configured GitHub
 user's pull requests for a date window, has an LLM (via Quarkus LangChain4j / OpenAI) write a
-changelog-style weekly summary, opens a GitHub issue with that summary, prints the issue URL, and
-exits. Driven on a schedule by `.github/workflows/weekly-contributions.yml` (Friday cron +
-manual `workflow_dispatch` with `since`/`until`/`repos` overrides).
+changelog-style weekly summary, prints that summary to stdout, and exits. Driven on a schedule by
+`.github/workflows/weekly-contributions.yml` (Friday cron + manual `workflow_dispatch` with
+`since`/`until`/`repos` overrides), which logs the report both to the step's plain CI log and to
+the run's job summary via `$GITHUB_STEP_SUMMARY` — there is no GitHub issue created.
 
 ## Commands
 
@@ -33,19 +34,18 @@ There is no `src/test` yet — `./mvnw package` currently builds without running
 
 ## Architecture
 
-The entire pipeline is a **Quarkus Flow** (serverless-workflow DSL) with exactly three steps,
+The entire pipeline is a **Quarkus Flow** (serverless-workflow DSL) with exactly two steps,
 declared declaratively in `WeeklyContributionsWorkflow.descriptor()`:
 
 ```
 fetchPullRequests (ExecutionInput -> WeekSummaryInput)
-        -> summarize (WeekSummaryInput -> IssueDraft)
-        -> createIssue (IssueDraft -> String issue URL)
+        -> summarize (WeekSummaryInput -> String markdown report)
 ```
 
 `Main` (the `@QuarkusMain` entry point) parses `--since`/`--until`/`--repos` into an
 `ExecutionInput`, starts the flow with `workflow.startInstance(input).await().indefinitely()`,
-prints the result, and exits with code 0 — there's no retry/error-recovery logic beyond what
-Quarkus Flow does.
+prints the resulting markdown report to stdout, and exits with code 0 — there's no
+retry/error-recovery logic beyond what Quarkus Flow does.
 
 Step-by-step:
 
@@ -66,24 +66,21 @@ Step-by-step:
    before being handed to the LLM.
 2. **`summarize`** calls `WeeklySummaryAgent` (a `@RegisterAiService` langchain4j interface —
    there is no implementation class; the body is generated at build time from the `@SystemMessage`
-   /`@UserMessage` prompt templates). The system prompt is strict about output shape: one
-   `Week:`/prose/`Pull request:`/`Project:`/`Status:` block per PR, labels verbatim, status
-   copied through unchanged and lowercase. If you change the GitHub issue's expected format,
-   the prompt in `WeeklySummaryAgent` is the single source of truth to edit.
-3. **`createIssue`** (`GitHubIssueReporter`) posts the generated markdown as a new issue, titled
-   `"Weekly contributions: <weekLabel>"`, labeled `generated-report`, to whatever
-   `contributions.issue.repository` resolves to — which can differ from the repo whose PRs were
-   fetched (`github.username`/`CONTRIBUTIONS_USERNAME`).
+   /`@UserMessage` prompt templates), returning the final markdown report string. The system
+   prompt is strict about output shape: one `Week:`/prose/`Pull request:`/`Project:`/`Status:`
+   block per PR, labels verbatim, status copied through unchanged and lowercase, and no issue/PR
+   cross-references other than the one `Pull request:` URL (so the report never creates GitHub
+   back-links when logged). If you change the expected output format, the prompt in
+   `WeeklySummaryAgent` is the single source of truth to edit.
 
-Two REST clients share one `github-api` configKey/base URL (`quarkus.rest-client.github-api.url`)
-but hit different endpoints: `GitHubSearchClient` (`/search/issues`) and `GitHubIssuesClient`
-(`POST /repos/{owner}/{repo}/issues`). Both take the bearer token and `Accept` header per-call
-rather than via a shared filter — add new GitHub endpoints the same way rather than introducing a
-client-level auth filter unless multiple clients start needing it.
+`GitHubSearchClient` (`/search/issues`) is the only REST client, sharing the `github-api`
+configKey/base URL (`quarkus.rest-client.github-api.url`). It takes the bearer token and `Accept`
+header per-call rather than via a shared filter — add new GitHub endpoints the same way rather
+than introducing a client-level auth filter unless multiple clients start needing it.
 
-Records carry data between flow steps and model GitHub data: `ExecutionInput`, `WeekSummaryInput`,
-`IssueDraft` (flow step payloads), `GitHubPullRequest`, `WeekWindow` (domain), and the
-`GitHubSearchResponse`/`GitHubIssueRequest`/`GitHubIssueResponse` REST DTOs under `github/`.
+Records carry data between flow steps and model GitHub data: `ExecutionInput`, `WeekSummaryInput`
+(flow step payloads), `GitHubPullRequest`, `WeekWindow` (domain), and the `GitHubSearchResponse`
+REST DTO under `github/`.
 
 ## Configuration
 

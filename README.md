@@ -2,13 +2,14 @@
 
 [![Docker Repository on Quay](https://quay.io/repository/mcruzdev/ownyourcareer/status "Docker Repository on Quay")](https://quay.io/repository/mcruzdev/ownyourcareer)
 
-Opens a weekly GitHub issue summarizing your merged/opened pull requests, written by an LLM.
+Generates a weekly changelog-style summary of your merged/opened pull requests, written by an LLM.
 Built with Quarkus, [Quarkus Flow](https://docs.quarkiverse.io/quarkus-flow/dev/index.html)
-(fetch PRs → summarize with langchain4j → open issue) and [Quarkus LangChain4j](https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html) (OpenAI).
+(fetch PRs → summarize with langchain4j) and [Quarkus LangChain4j](https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html) (OpenAI).
 
-It runs as a **command-mode app**: it executes once, prints the created issue's URL, and exits —
-no HTTP server stays up. `.github/workflows/weekly-contributions.yml` runs it every Friday via
-`workflow_dispatch`/cron.
+It runs as a **command-mode app**: it executes once, prints the generated report to stdout, and
+exits — no HTTP server stays up. `.github/workflows/weekly-contributions.yml` runs it every Friday
+via `workflow_dispatch`/cron, and logs the report both to the step's plain log and to the run's
+job summary (the "Log report to job summary" step).
 
 By default, it covers the current Monday–Friday. To report on a different range, pass
 `--since=YYYY-MM-DD --until=YYYY-MM-DD`:
@@ -33,9 +34,8 @@ manually via `workflow_dispatch`.
 | Variable | Where | Purpose |
 |---|---|---|
 | `CONTRIBUTIONS_USERNAME` (repo **secret**) | Settings → Secrets and variables → Actions → Secrets | GitHub username whose PRs are collected |
-| `CONTRIBUTIONS_GH_TOKEN` (repo **secret**) | Settings → Secrets and variables → Actions → Secrets | Classic PAT with `repo` scope — used both to search PRs across repos and to open the issue |
+| `CONTRIBUTIONS_GH_TOKEN` (repo **secret**) | Settings → Secrets and variables → Actions → Secrets | Classic PAT with `repo` scope — used to search PRs across repos |
 | `OPENAI_API_KEY` (repo **secret**) | same as above | Used by `quarkus-langchain4j-openai` |
-| `contributions.issue.repository` (`CONTRIBUTIONS_ISSUE_REPOSITORY` env var, config only) | `application.properties` | `owner/repo` where the weekly issue is opened, defaults to `mathecruz/ownyourcareer` |
 
 `.github/workflows/docker-publish.yml` builds the JVM image and pushes it to
 [quay.io/mcruzdev/ownyourcareer](https://quay.io/repository/mcruzdev/ownyourcareer) on every push

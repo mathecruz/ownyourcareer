@@ -33,7 +33,7 @@ jobs:
       - name: Build
         run: ./mvnw -B -DskipTests package
 
-      - name: Generate weekly contributions report and open issue
+      - name: Generate weekly contributions report
         env:
           GITHUB_USERNAME: ${{ vars.CONTRIBUTIONS_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.CONTRIBUTIONS_GH_TOKEN }}
@@ -42,4 +42,8 @@ jobs:
           java -jar target/quarkus-app/quarkus-run.jar \
             ${{ inputs.since && format('--since={0}', inputs.since) || '' }} \
             ${{ inputs.until && format('--until={0}', inputs.until) || '' }} \
-            ${{ inputs.repos && format('--repos={0}', inputs.repos) || '' }}
+            ${{ inputs.repos && format('--repos={0}', inputs.repos) || '' }} \
+            | tee report.md
+
+      - name: Log report to job summary
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"

@@ -14,7 +14,6 @@ import io.quarkiverse.flow.Flow;
 import io.serverlessworkflow.api.types.Workflow;
 
 import dev.matheuscruz.contributions.ai.WeeklySummaryAgent;
-import dev.matheuscruz.contributions.github.GitHubIssueReporter;
 import dev.matheuscruz.contributions.github.PullRequestFetcher;
 import dev.matheuscruz.contributions.model.GitHubPullRequest;
 import dev.matheuscruz.contributions.model.WeekWindow;
@@ -28,9 +27,6 @@ public class WeeklyContributionsWorkflow extends Flow {
     @Inject
     WeeklySummaryAgent summaryAgent;
 
-    @Inject
-    GitHubIssueReporter issueReporter;
-
     @Override
     public Workflow descriptor() {
         return workflow("weekly-contributions")
@@ -38,12 +34,9 @@ public class WeeklyContributionsWorkflow extends Flow {
                         function("fetchPullRequests", this::fetchWeek,
                                 ExecutionInput.class, WeekSummaryInput.class),
                         function("summarize",
-                                (WeekSummaryInput input) -> new IssueDraft(input.weekLabel(),
-                                        summaryAgent.summarizeWeek(input.weekLabel(), input.pullRequestsBlock())),
-                                WeekSummaryInput.class, IssueDraft.class),
-                        function("createIssue",
-                                (IssueDraft draft) -> issueReporter.createIssue(draft.weekLabel(), draft.body()),
-                                IssueDraft.class, String.class))
+                                (WeekSummaryInput input) -> summaryAgent.summarizeWeek(
+                                        input.weekLabel(), input.pullRequestsBlock()),
+                                WeekSummaryInput.class, String.class))
                 .build();
     }
 

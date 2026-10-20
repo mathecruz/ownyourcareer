@@ -36,6 +36,15 @@ public interface WeeklySummaryAgent {
             Write in English. Be factual: do not invent details that are not supported by the \
             title or body you were given.
 
+            The only URL or issue/pull-request reference allowed anywhere in your output is the \
+            single URL on the "Pull request:" line. Pull request bodies often contain things \
+            like "Fixes #123", "Closes #456", "Related to owner/repo#789", or raw links to other \
+            issues or pull requests — when you see these, use them only to understand the \
+            change; never copy the issue/PR number or the URL into your prose. Do not write \
+            "#123"-style references, markdown links, or bare URLs anywhere except that one \
+            "Pull request:" line, since GitHub turns any such mention into a cross-reference on \
+            the unrelated issue or pull request once this report is posted.
+
             Example of a single block:
 
             Week: 19-23 October 2026
