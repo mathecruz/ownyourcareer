@@ -43,7 +43,16 @@ jobs:
             ${{ inputs.since && format('--since={0}', inputs.since) || '' }} \
             ${{ inputs.until && format('--until={0}', inputs.until) || '' }} \
             ${{ inputs.repos && format('--repos={0}', inputs.repos) || '' }} \
-            | tee report.md
+            > report.md 2> app.log
+          cat app.log
+          cat report.md
 
       - name: Log report to job summary
-        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          {
+            echo '```shell'
+            cat app.log
+            echo '```'
+            echo
+            cat report.md
+          } >> "$GITHUB_STEP_SUMMARY"
